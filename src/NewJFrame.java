@@ -227,6 +227,11 @@ public class NewJFrame extends javax.swing.JFrame {
         jMenu2.add(jMIRotDir);
 
         jMIRotEsq.setText("Rotacionar à esquerda");
+        jMIRotEsq.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIRotEsqActionPerformed(evt);
+            }
+        });
         jMenu2.add(jMIRotEsq);
 
         jMIGama.setText("Correção Gama");
@@ -246,14 +251,16 @@ public class NewJFrame extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(0, 400, Short.MAX_VALUE))
+                .addGap(88, 88, 88)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(103, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addGap(0, 279, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(38, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30))
         );
 
         pack();
@@ -302,6 +309,7 @@ public class NewJFrame extends javax.swing.JFrame {
         WritableRaster raster = bi.copyData(null);
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
+    
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         System.exit(1);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -559,11 +567,11 @@ public class NewJFrame extends javax.swing.JFrame {
 
     private void jMIResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIResetActionPerformed
         
-        this.imagem1 = this.imagem1Backup;
+        this.imagem1 = deepCopy(imagem1Backup);
         ImageIcon icon = new ImageIcon(this.imagem1);
         this.jLabel1.setIcon(icon);
         setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
-        //this.imageUpdate(imagemAux, ALLBITS, 0, 0, width*2, height*2);
+        this.imageUpdate(imagem1, ALLBITS, 0, 0, imagem1.getWidth(), imagem1.getHeight());
     }//GEN-LAST:event_jMIResetActionPerformed
 
     private void jLabel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MousePressed
@@ -597,34 +605,63 @@ public class NewJFrame extends javax.swing.JFrame {
 
     private void jMIRotDirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRotDirActionPerformed
         
-        int height = imagem1.getHeight() ;
-        int width = imagem1.getWidth();
+        
+        rotateImage("right");
+        
+    }//GEN-LAST:event_jMIRotDirActionPerformed
+
+    private void rotateImage(String direction) {
+        
+        int height = imagem1.getWidth();
+        int width = imagem1.getHeight();
         int type = imagem1.getType();
         // Ampliar * 2
         BufferedImage imagemAux = new BufferedImage(width, height, type);
         
         int pixel;
         
-        double rotatioDegree = Math.toRadians (90);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) { 	
-                
-                //int rgb = imagem1.getRGB(i, j); 	
-		pixel = imagem1.getRGB(i, j);
-                
-                
-                imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
-                imagemAux.setRGB(j, i, pixel );
-                
-	    }
+        //double rotatioDegree = Math.toRadians (90);
+        
+        if(direction.equals("right"))
+        {
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) { 	
+
+                    //int rgb = imagem1.getRGB(i, j); 	
+                    pixel = imagem1.getRGB(i, j);
+
+
+                    //imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
+                    imagemAux.setRGB(width - j - 1, i, pixel );
+
+                }
+            }
         }
+        else if(direction.equals("left"))
+        {
+            
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) { 	
+
+                    //int rgb = imagem1.getRGB(i, j); 	
+                    pixel = imagem1.getRGB(i, j);
+
+
+                    //imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
+                    imagemAux.setRGB(j, height-i-1, pixel );
+
+                }
+            }
+        }
+        else
+            return;
+        
         this.imagem1 = imagemAux;
         ImageIcon icon = new ImageIcon(this.imagem1);
         this.jLabel1.setIcon(icon);
         setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
-        
-    }//GEN-LAST:event_jMIRotDirActionPerformed
-
+    }
+    
     private void jMIGamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIGamaActionPerformed
         // TODO add your handling code here:
         
@@ -688,6 +725,11 @@ public class NewJFrame extends javax.swing.JFrame {
 	    }                   
         } 
     }//GEN-LAST:event_jMISobreporActionPerformed
+
+    private void jMIRotEsqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRotEsqActionPerformed
+        // TODO add your handling code here
+        rotateImage("left");
+    }//GEN-LAST:event_jMIRotEsqActionPerformed
     private void sobrepor(BufferedImage imagemSobrepor) {
         //C = c1*(1-α) + c2*α;
         
