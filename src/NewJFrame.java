@@ -399,7 +399,7 @@ public class NewJFrame extends javax.swing.JFrame {
         int width = imagem1.getWidth();
         int type = imagem1.getType();
         // Ampliar * 2
-        BufferedImage imagemAux = new BufferedImage(height*2, width*2, type);
+        BufferedImage imagemAux = new BufferedImage(width*2, height*2, type);
         
         int pixel;
         for (int i = 0; i < width; i++) {
@@ -418,8 +418,8 @@ public class NewJFrame extends javax.swing.JFrame {
         this.imagem1 = imagemAux;
         ImageIcon icon = new ImageIcon(this.imagem1);
         this.jLabel1.setIcon(icon);
-        setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
-        //this.imageUpdate(imagemAux, ALLBITS, 0, 0, width*2, height*2);
+        setSize(imagem1.getWidth() + 25, imagem1.getHeight()+ 70);
+        this.imageUpdate(imagemAux, ALLBITS, 0, 0, width*2, height*2);
         
     }//GEN-LAST:event_jMIAmpliarActionPerformed
 
@@ -429,7 +429,7 @@ public class NewJFrame extends javax.swing.JFrame {
         int width = imagem1.getWidth();
         int type = imagem1.getType();
         // Ampliar * 2
-        BufferedImage imagemAux = new BufferedImage((height + 1)/2, (width + 1)/2, type);
+        BufferedImage imagemAux = new BufferedImage((width + 1)/2, (height + 1)/2, type);
         
 
         for (int i = 0; i < width; i++) {
@@ -621,40 +621,36 @@ public class NewJFrame extends javax.swing.JFrame {
         int pixel;
         
         //double rotatioDegree = Math.toRadians (90);
-        
-        if(direction.equals("right"))
-        {
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) { 	
-
-                    //int rgb = imagem1.getRGB(i, j); 	
-                    pixel = imagem1.getRGB(i, j);
-
-
-                    //imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
-                    imagemAux.setRGB(width - j - 1, i, pixel );
-
-                }
-            }
+        switch (direction) {
+            case "right":
+                for (int i = 0; i < width; i++) {
+                    for (int j = 0; j < height; j++) {
+                        
+                        //int rgb = imagem1.getRGB(i, j);
+                        pixel = imagem1.getRGB(j, i);
+                        
+                        
+                        //imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
+                        imagemAux.setRGB(width - i - 1, j, pixel );
+                        
+                    }
+                }   break;
+            case "left":
+                for (int i = 0; i < width; i++) {
+                    for (int j = 0; j < height; j++) {
+                        
+                        //int rgb = imagem1.getRGB(i, j);
+                        pixel = imagem1.getRGB(j, i);
+                        
+                        
+                        //imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
+                        imagemAux.setRGB(i, height-j-1, pixel );
+                        
+                    }
+                }   break;
+            default:
+                return;
         }
-        else if(direction.equals("left"))
-        {
-            
-            for (int i = 0; i < width; i++) {
-                for (int j = 0; j < height; j++) { 	
-
-                    //int rgb = imagem1.getRGB(i, j); 	
-                    pixel = imagem1.getRGB(i, j);
-
-
-                    //imagemAux.setRGB(i, j, imagem1.getRGB(j, i) );
-                    imagemAux.setRGB(j, height-i-1, pixel );
-
-                }
-            }
-        }
-        else
-            return;
         
         this.imagem1 = imagemAux;
         ImageIcon icon = new ImageIcon(this.imagem1);
