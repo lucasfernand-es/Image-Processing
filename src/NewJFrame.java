@@ -16,6 +16,8 @@ import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedImageAdapter;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
@@ -31,6 +33,7 @@ public class NewJFrame extends javax.swing.JFrame {
     private BufferedImage imagemSobrepor = null;
     
     private boolean isPGM = false;
+    private int actualGrayPGM = 0;
     
     private double alpha = 0.0;
     
@@ -205,6 +208,11 @@ public class NewJFrame extends javax.swing.JFrame {
         jMenu1.add(jMenuItem2);
 
         jMISalvarPGM.setText("Salvar PGM...");
+        jMISalvarPGM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMISalvarPGMActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMISalvarPGM);
 
         jMenuItem3.setLabel("Sair");
@@ -405,7 +413,9 @@ public class NewJFrame extends javax.swing.JFrame {
                   updateImage(imagem1);
                   this.imagem1Original =  deepCopy(imagem1);
                   this.imagem1Desfazer = deepCopy(imagem1);
-                  System.out.println("type " + imagem1.getType());
+                  //System.out.println("type " + imagem1.getType());
+                  
+                  isPGM = false;
 	    }
 	    catch(IOException e){
 		System.out.println("Erro IO Exception! Verifique se o arquivo especificado existe e tente novamente.");
@@ -876,12 +886,105 @@ public class NewJFrame extends javax.swing.JFrame {
         if(op == JFileChooser.APPROVE_OPTION){  
             File arq = chooser.getSelectedFile();  
             String path = arq.toString(); 
-            System.out.println(path);
+            //System.out.println(path);
             
              createPGM_P2(path);
+             isPGM = true;
                   
         }
     }//GEN-LAST:event_jMIAbrirPGMActionPerformed
+
+    private void jMISalvarPGMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISalvarPGMActionPerformed
+        // TODO add your handling code here:
+        
+        if(!isPGM)
+        {
+            System.out.println("A imagem atual não está no formato PGM.");
+        }
+        
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PGM Images", "pgm");
+        chooser.setFileFilter(filter);
+        chooser.setDialogTitle("Salvar Imagem PGM");
+        int op = chooser.showSaveDialog(this);
+        if(op == JFileChooser.APPROVE_OPTION){  
+            File arq = chooser.getSelectedFile();  
+            String path = arq.toString();  
+            
+            savePGM_P2(path);
+            System.out.println("Arquivo salvo com sucesso!");
+        }
+    }//GEN-LAST:event_jMISalvarPGMActionPerformed
+    
+    private void savePGM_P2(String path)  {
+        
+        
+        //PrintWriter out = new PrintWriter("filename.txt");
+        try(PrintWriter writer = new PrintWriter(path, "UTF-8")) {
+            //String pgmFile = "";
+            // Tipo do arquivo
+            writer.println("P2");
+            // Título
+            writer.println("# My PGM P2 File");
+            // Tamanho da Imagem
+            int width = imagem1.getWidth();
+            int height = imagem1.getHeight();
+            
+            writer.println(width + " " + height);
+            
+            // Tom máximo de cinze valor d
+            int currentMaxVal = 0;
+            
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) { 	
+
+                    Color cor = new Color(imagem1.getRGB(i, j));
+
+                    if(cor.getRed() > currentMaxVal)
+                    {
+                        currentMaxVal = cor.getRed();
+                        //System.out.println("x- " + j + " y- "+ i);
+                    }
+                }
+            }
+            // Escreve cinza máximo - precisa convertar do cinza máximo atual para o cinza máximo original
+            //writer.println(currentMaxVal);
+            //System.out.println(actualGrayPGM);
+            writer.println(actualGrayPGM);
+            
+            // Escrever os pixels
+            
+            int countElementLine = 0;
+            
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) { 	
+
+                    Color cor = new Color(imagem1.getRGB(x, y));
+                    
+                    int actualGrayShade = convertGray(cor.getBlue(), actualGrayPGM, currentMaxVal);
+                    
+                    writer.print(actualGrayShade);
+                    
+                    countElementLine++;
+                    // Se tem 70 elementos
+                    if(countElementLine >= 70) {
+                        // Insera uma nova linha do arquivo se não for a última linha da imagem
+                        
+                        writer.println("\n");
+                        countElementLine = 0;
+                    }
+                    else // caso não seja um final de linha, insere espaço
+                        writer.print(" ");
+                    
+                }
+            }
+            
+            
+        } catch (UnsupportedEncodingException | FileNotFoundException ex) {
+            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
     
     private void createPGM_P2(String path){
         //InputStream file = ClassLoader.getSystemClassLoader().getResourceAsStream(path);
@@ -908,7 +1011,6 @@ public class NewJFrame extends javax.swing.JFrame {
         BufferedReader data;
         try{
             data = new BufferedReader(new FileReader(path));
-            System.out.println("oi");
             
         }
         catch(FileNotFoundException ex) {
@@ -919,7 +1021,7 @@ public class NewJFrame extends javax.swing.JFrame {
         try {
                 // Deve conter P2
                 String fileID = data.readLine();
-                System.out.println(fileID);
+                //System.out.println(fileID);
                 
                 if(!fileID.equalsIgnoreCase("P2")){
                     System.out.println("Somente arquivo .PGM no formato P2 são aceitos!");
@@ -929,31 +1031,33 @@ public class NewJFrame extends javax.swing.JFrame {
                 String nextlLine = data.readLine(); // Ignora a linha do título
                 
                 while(nextlLine.startsWith("#")){
-                    System.out.println("titleLine" + nextlLine);
+                    System.out.println(nextlLine);
                     nextlLine = data.readLine();
                 }
                 
                 String size = nextlLine; // Contém a largura e a altura da imagem
-                System.out.println("size " + size);
+                //System.out.println("size " + size);
                 
                 Scanner scanner = new Scanner(size);
                 int width = scanner.nextInt();
                 int height = scanner.nextInt();
-                System.out.println(width + height);
+                //System.out.println(width + height);
                 
             
                 String maxGray = data.readLine();// Contém o valor máximo de cinza
-                System.out.println("maxGray " + maxGray);
+                //System.out.println(maxGray);
                 
                 scanner = new Scanner(maxGray);
                 int maxVal = scanner.nextInt();
+                
+                actualGrayPGM = maxVal;
                 
                 BufferedImage imageAux = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
                 
                 
                 // Linha atual
                 String currentLine;
-                String  scanCurrentLine[];
+                String scanCurrentLine[];
                 
                 
                 // Contam a altura e a largura da imagem
@@ -983,9 +1087,10 @@ public class NewJFrame extends javax.swing.JFrame {
                         if(!element.matches("[0-9]+"))
                             continue;
                         
-                        // Captura o pixel atual - clarificando o código
-                        pixel = calcGray(Integer.parseInt(element), maxVal); 
-                        //System.out.print(pixel + " ");
+                        // Captura o pixel atual - clarificando o código - 255 é o máximo do RGB
+                        pixel = convertGray(Integer.parseInt(element), maxVal, 255); 
+                        if(pixel > 255)
+                            System.out.print(pixel + " X " + flagX + " Y " + flagY + " element = " + element);
 
                         int R = pixel;
                         int G = pixel;
@@ -1001,15 +1106,14 @@ public class NewJFrame extends javax.swing.JFrame {
                         countElement++;
                          // Se percorreu uma linha inteiro
                         if(flagY == width) {
-                            System.out.println("");
-                            System.out.println("flagX "+ (flagX) + " flagY " + flagY);
+                            //System.out.println("");
+                            //System.out.println("flagX "+ (flagX) + " flagY " + flagY);
                             flagX++;
                             flagY = 0;
                         }
                     }
                 }
                  
-                
                 if (flag == 0) {
                     //Container contentPane = getContentPane();
                     jPImage.setLayout(new GridLayout());
@@ -1034,12 +1138,12 @@ public class NewJFrame extends javax.swing.JFrame {
                 
     
     }
-    
-    private int calcGray(int pixel, int maxVal) 
-    {
+   
+    // Regra de três para converter
+    private int convertGray(int pixel, int currentMaxVal, int actualGray) {
         // Pixel está para maxVal
-        // assim como X está para 255
-        return (pixel * 255) / maxVal;
+        // assim como X está para actualGray
+        return (pixel * actualGray) / currentMaxVal;
     }
     
     private void sobrepor() {
@@ -1186,4 +1290,6 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSlider jSAlpha;
     // End of variables declaration//GEN-END:variables
+
+    
 }
