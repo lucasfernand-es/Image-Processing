@@ -986,7 +986,8 @@ public class NewJFrame extends javax.swing.JFrame {
         
     }
     
-    private void createPGM_P2(String path){
+    private void createPGM_P2(String path){ 
+        
         //InputStream file = ClassLoader.getSystemClassLoader().getResourceAsStream(path);
         
         //br = new BufferedReader(new FileReader("C:\\testing.txt"));
