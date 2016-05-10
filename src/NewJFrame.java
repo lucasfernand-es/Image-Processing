@@ -12,7 +12,12 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
+import java.util.ArrayList;
+import java.util.Scanner;
+import javax.media.jai.JAI;
+import javax.media.jai.RenderedImageAdapter;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import javax.swing.filechooser.*;
@@ -20,12 +25,20 @@ import javax.swing.filechooser.*;
 public class NewJFrame extends javax.swing.JFrame {
     private BufferedImage imagem1;
     int flag=0;
-    private BufferedImage imagem1Backup;
+    
+    private BufferedImage imagem1Desfazer;
+    private BufferedImage imagem1Original;
+    private BufferedImage imagemSobrepor = null;
+    
+    private boolean isPGM = false;
+    
+    private double alpha = 0.0;
     
     private int X1, Y1, X2, Y2;
    
     public NewJFrame() {
         initComponents();
+        //this.setResizable(false);
     }
 
     /**
@@ -39,12 +52,20 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
+        jPImage = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jSAlpha = new javax.swing.JSlider();
+        jLabel2 = new javax.swing.JLabel();
+        jLAlphaIndex = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMISI = new javax.swing.JMenuItem();
+        jMIAbrirPGM = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMISobrepor = new javax.swing.JMenuItem();
+        jMISalvarPGM = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMIReset = new javax.swing.JMenuItem();
@@ -63,6 +84,7 @@ public class NewJFrame extends javax.swing.JFrame {
         jMIRotDir = new javax.swing.JMenuItem();
         jMIRotEsq = new javax.swing.JMenuItem();
         jMIGama = new javax.swing.JMenuItem();
+        jMISobrepor = new javax.swing.JMenuItem();
 
         jMenuItem4.setText("jMenuItem4");
 
@@ -70,6 +92,7 @@ public class NewJFrame extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jLabel1MousePressed(evt);
@@ -78,6 +101,73 @@ public class NewJFrame extends javax.swing.JFrame {
                 jLabel1MouseReleased(evt);
             }
         });
+
+        javax.swing.GroupLayout jPImageLayout = new javax.swing.GroupLayout(jPImage);
+        jPImage.setLayout(jPImageLayout);
+        jPImageLayout.setHorizontalGroup(
+            jPImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPImageLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 109, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPImageLayout.setVerticalGroup(
+            jPImageLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPImageLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(140, Short.MAX_VALUE))
+        );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sobrepor Imagens"));
+        jPanel1.setName(""); // NOI18N
+
+        jSAlpha.setToolTipText("");
+        jSAlpha.setValue(0);
+        jSAlpha.setEnabled(false);
+        jSAlpha.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSAlphaStateChanged(evt);
+            }
+        });
+
+        jLabel2.setText("Índice:");
+
+        jLAlphaIndex.setText("0%");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSAlpha, javax.swing.GroupLayout.DEFAULT_SIZE, 390, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLAlphaIndex)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLAlphaIndex))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSAlpha, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 39, Short.MAX_VALUE)
+        );
 
         jMenu1.setText("Arquivo");
 
@@ -89,6 +179,23 @@ public class NewJFrame extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem1);
 
+        jMISI.setText("Abrir Segunda Imagem...");
+        jMISI.setActionCommand("");
+        jMISI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMISIActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMISI);
+
+        jMIAbrirPGM.setText("Abrir PGM (P2)...");
+        jMIAbrirPGM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIAbrirPGMActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMIAbrirPGM);
+
         jMenuItem2.setLabel("Salvar...");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -97,14 +204,8 @@ public class NewJFrame extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem2);
 
-        jMISobrepor.setText("Abrir Imagem e Soprepor...");
-        jMISobrepor.setActionCommand("");
-        jMISobrepor.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMISobreporActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMISobrepor);
+        jMISalvarPGM.setText("Salvar PGM...");
+        jMenu1.add(jMISalvarPGM);
 
         jMenuItem3.setLabel("Sair");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
@@ -242,6 +343,15 @@ public class NewJFrame extends javax.swing.JFrame {
         });
         jMenu2.add(jMIGama);
 
+        jMISobrepor.setText("Sobrepor");
+        jMISobrepor.setEnabled(false);
+        jMISobrepor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMISobreporActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMISobrepor);
+
         jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
@@ -250,17 +360,19 @@ public class NewJFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(88, 88, 88)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(103, Short.MAX_VALUE))
+            .addComponent(jPImage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(38, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(30, 30, 30))
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPImage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
@@ -281,17 +393,19 @@ public class NewJFrame extends javax.swing.JFrame {
                   //carrega nova imagem
                   imagem1 = ImageIO.read(new File(path));
                   System.out.println("Arquivo aberto com sucesso!");
-                  ImageIcon icon = new ImageIcon(imagem1);
+                  //ImageIcon icon = new ImageIcon(imagem1);
+                  //jLabel1.setIcon(icon);
                   if (flag==0) {
-                      jLabel1.setIcon(icon);
-                      Container contentPane = getContentPane();
-                      contentPane.setLayout(new GridLayout());
-                      contentPane.add(new JScrollPane(jLabel1));
+                      //Container contentPane = getContentPane();
+                      jPImage.setLayout(new GridLayout());
+                      jPImage.add(new JScrollPane(jLabel1));
                       flag=1;
                   }
-                  else jLabel1.setIcon(icon);
-                  setSize(imagem1.getWidth()+25, imagem1.getHeight()+70);
-                  this.imagem1Backup =  deepCopy(imagem1);
+                  //setSize(imagem1.getWidth()+25, imagem1.getHeight()+70);
+                  updateImage(imagem1);
+                  this.imagem1Original =  deepCopy(imagem1);
+                  this.imagem1Desfazer = deepCopy(imagem1);
+                  System.out.println("type " + imagem1.getType());
 	    }
 	    catch(IOException e){
 		System.out.println("Erro IO Exception! Verifique se o arquivo especificado existe e tente novamente.");
@@ -362,7 +476,8 @@ public class NewJFrame extends javax.swing.JFrame {
 		imagem1.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
 
     }//GEN-LAST:event_jMNegativoActionPerformed
 
@@ -389,7 +504,8 @@ public class NewJFrame extends javax.swing.JFrame {
 		imagem1.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
     }//GEN-LAST:event_jMIEscalaCinzaActionPerformed
 
     private void jMIAmpliarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAmpliarActionPerformed
@@ -415,11 +531,8 @@ public class NewJFrame extends javax.swing.JFrame {
                 
 	    }
         }
-        this.imagem1 = imagemAux;
-        ImageIcon icon = new ImageIcon(this.imagem1);
-        this.jLabel1.setIcon(icon);
-        setSize(imagem1.getWidth() + 25, imagem1.getHeight()+ 70);
-        this.imageUpdate(imagemAux, ALLBITS, 0, 0, width*2, height*2);
+        
+        updateImage(imagemAux);
         
     }//GEN-LAST:event_jMIAmpliarActionPerformed
 
@@ -437,10 +550,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 imagemAux.setRGB(i/2, j/2, imagem1.getRGB(i, j));
 	    }
         }
-        this.imagem1 = imagemAux;
-        ImageIcon icon = new ImageIcon(this.imagem1);
-        this.jLabel1.setIcon(icon);
-        setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
+        updateImage(imagemAux);
         //this.imageUpdate(imagemAux, ALLBITS, 0, 0, width*2, height*2);
     }//GEN-LAST:event_jMIReducaoActionPerformed
 
@@ -461,7 +571,8 @@ public class NewJFrame extends javax.swing.JFrame {
 		imagem1.setRGB(i, j, cor.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
+  //      this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
         
     }//GEN-LAST:event_jMISepiaActionPerformed
 
@@ -479,7 +590,8 @@ public class NewJFrame extends javax.swing.JFrame {
                 imagem1.setRGB(width-i-1, j, pixel);
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
         
     }//GEN-LAST:event_jMIEspelhoHorizontalActionPerformed
 
@@ -497,7 +609,8 @@ public class NewJFrame extends javax.swing.JFrame {
                 imagem1.setRGB(i, height-j-1, pixel);
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
     }//GEN-LAST:event_jMIEspelhoVerticalActionPerformed
 
     private void jMIRedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRedActionPerformed
@@ -519,8 +632,8 @@ public class NewJFrame extends javax.swing.JFrame {
 		imagem1.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
-        
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
     }//GEN-LAST:event_jMIRedActionPerformed
 
     private void jMIGreenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIGreenActionPerformed
@@ -541,7 +654,8 @@ public class NewJFrame extends javax.swing.JFrame {
 		imagem1.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagem1);
     }//GEN-LAST:event_jMIGreenActionPerformed
 
     private void jMIBlueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIBlueActionPerformed
@@ -562,16 +676,15 @@ public class NewJFrame extends javax.swing.JFrame {
 		imagem1.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        
+        updateImage(imagem1);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
     }//GEN-LAST:event_jMIBlueActionPerformed
 
     private void jMIResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIResetActionPerformed
         
-        this.imagem1 = deepCopy(imagem1Backup);
-        ImageIcon icon = new ImageIcon(this.imagem1);
-        this.jLabel1.setIcon(icon);
-        setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, imagem1.getWidth(), imagem1.getHeight());
+        this.imagem1 = deepCopy(this.imagem1Original);
+        updateImage(imagem1);
     }//GEN-LAST:event_jMIResetActionPerformed
 
     private void jLabel1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MousePressed
@@ -596,10 +709,7 @@ public class NewJFrame extends javax.swing.JFrame {
             
         }
         
-        imagem1 = imagem1.getSubimage(X1, Y1, Math.abs(x),Math.abs(y));
-        ImageIcon icon = new ImageIcon(this.imagem1);
-        this.jLabel1.setIcon(icon);
-        setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
+        //updateImage(imagemAux);
         
     }//GEN-LAST:event_jMIRetanguloRecorteActionPerformed
 
@@ -652,15 +762,11 @@ public class NewJFrame extends javax.swing.JFrame {
                 return;
         }
         
-        this.imagem1 = imagemAux;
-        ImageIcon icon = new ImageIcon(this.imagem1);
-        this.jLabel1.setIcon(icon);
-        setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
+        updateImage(imagemAux);
     }
     
     private void jMIGamaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIGamaActionPerformed
         // TODO add your handling code here:
-        
         
         
         int width = imagem1.getWidth();
@@ -678,11 +784,14 @@ public class NewJFrame extends javax.swing.JFrame {
                 imagem1.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        
+        updateImage(imagem1);
+        
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
         
     }//GEN-LAST:event_jMIGamaActionPerformed
 
-    private void jMISobreporActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISobreporActionPerformed
+    private void jMISIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISIActionPerformed
         // TODO add your handling code here:
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("BMP, JPG, PNG & GIF Images", "bmp", "jpg", "png", "gif");
@@ -695,10 +804,13 @@ public class NewJFrame extends javax.swing.JFrame {
             String path = arq.toString();  
             try { 
                   //carrega nova imagem
-                  BufferedImage imagemSobrepor = ImageIO.read(new File(path));
-                  
+                  this.imagemSobrepor = ImageIO.read(new File(path));
+                  //ImageIcon icon = new ImageIcon(imagem1);
                   System.out.println("Arquivo aberto com sucesso!");
-                  sobrepor(imagemSobrepor);
+                  
+                  jMISobrepor.setEnabled(true);
+                  
+                  
                   /*
                     ImageIcon icon = new ImageIcon(imagemSobrepor);
                     if (flag==0) {
@@ -712,6 +824,7 @@ public class NewJFrame extends javax.swing.JFrame {
                     setSize(imagem1.getWidth()+25, imagem1.getHeight()+70);
                     this.imagem1Backup =  deepCopy(imagem1);
                   */
+
 	    }
 	    catch(IOException e){
 		System.out.println("Erro IO Exception! Verifique se o arquivo especificado existe e tente novamente.");
@@ -720,40 +833,239 @@ public class NewJFrame extends javax.swing.JFrame {
 		System.out.println("Erro Exception! " + e.getMessage());
 	    }                   
         } 
-    }//GEN-LAST:event_jMISobreporActionPerformed
+        //jMISobrepor.setEnabled(true);
+        
+        
+    }//GEN-LAST:event_jMISIActionPerformed
 
     private void jMIRotEsqActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIRotEsqActionPerformed
         // TODO add your handling code here
         rotateImage("left");
     }//GEN-LAST:event_jMIRotEsqActionPerformed
-    private void sobrepor(BufferedImage imagemSobrepor) {
+
+    private void jSAlphaStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSAlphaStateChanged
+        // TODO add your handling code here:
+        
+        JSlider s = (JSlider)evt.getSource();
+        int index = s.getValue();
+       
+        alpha =  index/100.0;
+        jLAlphaIndex.setText(index + "%");
+        
+        sobrepor();
+        
+    }//GEN-LAST:event_jSAlphaStateChanged
+
+    private void jMISobreporActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISobreporActionPerformed
+        // TODO add your handling code here:
+        
+        this.imagem1Desfazer = deepCopy(this.imagem1);
+        this.jSAlpha.setEnabled(true);
+        //sobrepor();
+    }//GEN-LAST:event_jMISobreporActionPerformed
+
+    private void jMIAbrirPGMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAbrirPGMActionPerformed
+        // TODO add your handling code here:
+        
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("PGM Images", "pgm");
+        chooser.setCurrentDirectory(new File("lucasfernandes//images"));
+        chooser.setFileFilter(filter);
+        chooser.setDialogTitle("Abrir Imagem PGM");
+        int op = chooser.showOpenDialog(this);
+        if(op == JFileChooser.APPROVE_OPTION){  
+            File arq = chooser.getSelectedFile();  
+            String path = arq.toString(); 
+            System.out.println(path);
+            
+             createPGM_P2(path);
+                  
+        }
+    }//GEN-LAST:event_jMIAbrirPGMActionPerformed
+    
+    private void createPGM_P2(String path){
+        //InputStream file = ClassLoader.getSystemClassLoader().getResourceAsStream(path);
+        
+        //br = new BufferedReader(new FileReader("C:\\testing.txt"));
+        /*
+        
+            RenderedImage rending= JAI.create("fileload",path);
+            BufferedImage imageAux = new RenderedImageAdapter(rending).getAsBufferedImage();
+            //System.out.println(imageAux.getType());
+            if (flag == 0) {
+                        //Container contentPane = getContentPane();
+                        jPImage.setLayout(new GridLayout());
+                        jPImage.add(new JScrollPane(jLabel1));
+                        flag = 1;
+                    }
+                    updateImage(imageAux);
+                    this.imagem1Original =  deepCopy(imageAux);
+                    this.imagem1Desfazer = deepCopy(imageAux);
+                    updateImage(imageAux);
+        
+        */
+        
+        BufferedReader data;
+        try{
+            data = new BufferedReader(new FileReader(path));
+            System.out.println("oi");
+            
+        }
+        catch(FileNotFoundException ex) {
+            System.out.println("Arquivo não encontrado " + ex.getMessage());
+            return;
+        }
+       
+        try {
+                // Deve conter P2
+                String fileID = data.readLine();
+                System.out.println(fileID);
+                
+                if(!fileID.equalsIgnoreCase("P2")){
+                    System.out.println("Somente arquivo .PGM no formato P2 são aceitos!");
+                    return;
+                }
+                
+                String nextlLine = data.readLine(); // Ignora a linha do título
+                
+                while(nextlLine.startsWith("#")){
+                    System.out.println("titleLine" + nextlLine);
+                    nextlLine = data.readLine();
+                }
+                
+                String size = nextlLine; // Contém a largura e a altura da imagem
+                System.out.println("size " + size);
+                
+                Scanner scanner = new Scanner(size);
+                int width = scanner.nextInt();
+                int height = scanner.nextInt();
+                System.out.println(width + height);
+                
+            
+                String maxGray = data.readLine();// Contém o valor máximo de cinza
+                System.out.println("maxGray " + maxGray);
+                
+                scanner = new Scanner(maxGray);
+                int maxVal = scanner.nextInt();
+                
+                BufferedImage imageAux = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+                
+                
+                // Linha atual
+                String currentLine;
+                String  scanCurrentLine[];
+                
+                
+                // Contam a altura e a largura da imagem
+                // Arquivos P2 possuem no máximo 70 caracteres por linha
+                int flagX = 0;
+                // flagCount
+                int flagY = 0;
+                // pixel atual
+                
+                int pixel;
+                
+                // contas quantos elemento tem
+                int countElement = 0;
+                        
+                while(countElement < width * height) {
+                    
+                    
+                    //Lê a próxima linha
+                    currentLine = data.readLine();
+                    scanCurrentLine = currentLine.split(" ");
+                    
+                
+                    // Elementos da lista
+                     // Lê um elemento
+                    for(String element: scanCurrentLine) {
+                        
+                        if(!element.matches("[0-9]+"))
+                            continue;
+                        
+                        // Captura o pixel atual - clarificando o código
+                        pixel = calcGray(Integer.parseInt(element), maxVal); 
+                        //System.out.print(pixel + " ");
+
+                        int R = pixel;
+                        int G = pixel;
+                        int B = pixel;
+                        
+                        Color color = new Color(R, G, B);
+                        
+                        imageAux.setRGB(flagY, flagX, color.getRGB());
+                        
+                        // Percorre a largura
+                        flagY++; 
+                        // Elemento adicionado
+                        countElement++;
+                         // Se percorreu uma linha inteiro
+                        if(flagY == width) {
+                            System.out.println("");
+                            System.out.println("flagX "+ (flagX) + " flagY " + flagY);
+                            flagX++;
+                            flagY = 0;
+                        }
+                    }
+                }
+                 
+                
+                if (flag == 0) {
+                    //Container contentPane = getContentPane();
+                    jPImage.setLayout(new GridLayout());
+                    jPImage.add(new JScrollPane(jLabel1));
+                    flag = 1;
+                }
+                updateImage(imageAux);
+                this.imagem1Original =  deepCopy(imageAux);
+                this.imagem1Desfazer = deepCopy(imageAux);
+                System.out.println("type " + imagem1.getType());
+                updateImage(imageAux);
+                        
+                //BufferedImage imagemAux = new BufferedImage(width, height, type);
+	    
+            }
+	    catch(IOException e){
+		System.out.println("Erro IO Exception! Verifique se o arquivo especificado existe e tente novamente.");
+	    }
+            catch(ArrayIndexOutOfBoundsException ex) {
+                System.out.println("Fora do tamanho: " + ex.getMessage());
+            }
+                
+    
+    }
+    
+    private int calcGray(int pixel, int maxVal) 
+    {
+        // Pixel está para maxVal
+        // assim como X está para 255
+        return (pixel * 255) / maxVal;
+    }
+    
+    private void sobrepor() {
         //C = c1*(1-α) + c2*α;
         
-        int width = imagem1.getWidth();
-	int height = imagem1.getHeight();
+        //this.imagem1 = deepCopy(imagem1Desfazer);
+        BufferedImage imagemCopy = deepCopy(imagem1Desfazer);
         
-        if(imagemSobrepor.getHeight() != height || imagemSobrepor.getWidth() != width){
+        int width = imagemCopy.getWidth();
+	int height = imagemCopy.getHeight();
+        int type = imagemCopy.getType();
+        
+        if(this.imagemSobrepor.getHeight() != height || this.imagemSobrepor.getWidth() != width){
             JOptionPane.showMessageDialog(null, "Imagens possuem tamanhos diferentes", "Erro!", ERROR_MESSAGE);
+            this.jSAlpha.setEnabled(false);
+            jMISobrepor.setEnabled(false);
             return;
         }
         
-        double alpha;
-        try{
-            String number;
-            do {
-                number = JOptionPane.showInputDialog(null, "Digite um número alpha entre 0 à 1", "Selecione alpha", INFORMATION_MESSAGE);
-                alpha = Double.parseDouble(number);
-            }while(alpha < 0 || alpha > 1);
-        }
-        catch(HeadlessException | NumberFormatException ex){
-		System.out.println("Erro Exception! " + ex.getMessage());
-                return;
-        }
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
         
 	for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) { 	
                 
-		Color corI1 = new Color(imagem1.getRGB(i, j));
+		Color corI1 = new Color(imagemCopy.getRGB(i, j));
                 Color corIS = new Color(imagemSobrepor.getRGB(i, j));
                 int R = (int) (corI1.getRed()   * (1 - alpha) + corIS.getRed()      * alpha );
                 int G = (int) (corI1.getGreen() * (1 - alpha) + corIS.getGreen()    * alpha );
@@ -762,10 +1074,24 @@ public class NewJFrame extends javax.swing.JFrame {
 
                 Color color = new Color(R, G, B);
 
-                imagem1.setRGB(i, j, color.getRGB());
+                imagemAux.setRGB(i, j, color.getRGB());
 	    }
         }
-        this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        //this.imageUpdate(imagem1, ALLBITS, 0, 0, width, height);
+        updateImage(imagemAux);
+        
+        
+    } 
+    
+    private void updateImage(BufferedImage imagemAux) {
+        
+        this.imagem1 = deepCopy(imagemAux);
+        ImageIcon icon = new ImageIcon(this.imagem1);
+        this.jLabel1.setIcon(icon);
+        //setSize(imagem1.getWidth() + 25, imagem1.getWidth() + 70);
+        
+        this.setSize(new Dimension((imagem1.getWidth() + 25 > 200)? imagem1.getWidth() + 25: 225, imagem1.getHeight() + 200));
+    
     }
     
     private Color calcSepiaRGB(Color cor){
@@ -824,7 +1150,10 @@ public class NewJFrame extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLAlphaIndex;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JMenuItem jMIAbrirPGM;
     private javax.swing.JMenuItem jMIAmpliar;
     private javax.swing.JMenuItem jMIBlue;
     private javax.swing.JMenuItem jMIEscalaCinza;
@@ -838,6 +1167,8 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMIRetanguloRecorte;
     private javax.swing.JMenuItem jMIRotDir;
     private javax.swing.JMenuItem jMIRotEsq;
+    private javax.swing.JMenuItem jMISI;
+    private javax.swing.JMenuItem jMISalvarPGM;
     private javax.swing.JMenuItem jMISepia;
     private javax.swing.JMenuItem jMISobrepor;
     private javax.swing.JMenuItem jMNegativo;
@@ -850,5 +1181,9 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem7;
+    private javax.swing.JPanel jPImage;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JSlider jSAlpha;
     // End of variables declaration//GEN-END:variables
 }
