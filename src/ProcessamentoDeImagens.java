@@ -12,19 +12,17 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.ColorModel;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedImageAdapter;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import javax.swing.filechooser.*;
 
-public class NewJFrame extends javax.swing.JFrame {
+public class ProcessamentoDeImagens extends javax.swing.JFrame {
     private BufferedImage imagem1;
     int flag=0;
     
@@ -39,7 +37,7 @@ public class NewJFrame extends javax.swing.JFrame {
     
     private int X1, Y1, X2, Y2;
    
-    public NewJFrame() {
+    public ProcessamentoDeImagens() {
         initComponents();
         //this.setResizable(false);
     }
@@ -87,6 +85,11 @@ public class NewJFrame extends javax.swing.JFrame {
         jMIRotDir = new javax.swing.JMenuItem();
         jMIRotEsq = new javax.swing.JMenuItem();
         jMIGama = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMIFiltroMedia = new javax.swing.JMenuItem();
+        jMIFiltroGaussiano3 = new javax.swing.JMenuItem();
+        jMIFiltroGaussiano5 = new javax.swing.JMenuItem();
+        jMISharpen = new javax.swing.JMenuItem();
         jMISobrepor = new javax.swing.JMenuItem();
 
         jMenuItem4.setText("jMenuItem4");
@@ -350,6 +353,42 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
         jMenu2.add(jMIGama);
+
+        jMenu4.setText("Filtros");
+
+        jMIFiltroMedia.setText("Média");
+        jMIFiltroMedia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIFiltroMediaActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMIFiltroMedia);
+
+        jMIFiltroGaussiano3.setText("Gaussiano 3X3");
+        jMIFiltroGaussiano3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIFiltroGaussiano3ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMIFiltroGaussiano3);
+
+        jMIFiltroGaussiano5.setText("Gaussiano 5X5");
+        jMIFiltroGaussiano5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIFiltroGaussiano5ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMIFiltroGaussiano5);
+
+        jMISharpen.setText("Sharpen");
+        jMISharpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMISharpenActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMISharpen);
+
+        jMenu2.add(jMenu4);
 
         jMISobrepor.setText("Sobrepor");
         jMISobrepor.setEnabled(false);
@@ -915,6 +954,94 @@ public class NewJFrame extends javax.swing.JFrame {
             System.out.println("Arquivo salvo com sucesso!");
         }
     }//GEN-LAST:event_jMISalvarPGMActionPerformed
+
+    private void jMIFiltroGaussiano3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIFiltroGaussiano3ActionPerformed
+        // TODO add your handling code here:
+        
+        int height = imagem1.getHeight();
+        int width = imagem1.getWidth();
+        int type = imagem1.getType();
+        // Ampliar * 2
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
+        float data[] = {    1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f,
+                            1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f, 
+                            1.0f/9.0f, 1.0f/9.0f, 1.0f/9.0f };
+    
+        Kernel kernel = new Kernel(3, 3, data);
+        ConvolveOp convolve = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        convolve.filter(imagem1, imagemAux);
+        
+        updateImage(imagemAux);
+    }//GEN-LAST:event_jMIFiltroGaussiano3ActionPerformed
+
+    private void jMIFiltroMediaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIFiltroMediaActionPerformed
+        
+        int height = imagem1.getHeight();
+        int width = imagem1.getWidth();
+        int type = imagem1.getType();
+        // Ampliar * 2
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
+        float data[] = {    0.0625f,     0.125f,     0.0625f,
+                            0.125f,      0.25f,      0.125f, 
+                            0.0625f,     0.125f,     0.0625f };
+    
+        Kernel kernel = new Kernel(3, 3, data);
+        ConvolveOp convolve = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        convolve.filter(imagem1, imagemAux);
+        
+        updateImage(imagemAux);
+
+        
+    }//GEN-LAST:event_jMIFiltroMediaActionPerformed
+
+    private void jMIFiltroGaussiano5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIFiltroGaussiano5ActionPerformed
+        
+        int height = imagem1.getHeight();
+        int width = imagem1.getWidth();
+        int type = imagem1.getType();
+        // Ampliar * 2
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
+        float data[] = {    1.0f/273.0f, 4.0f/273.0f,   7.0f/273.0f,    4.0f/273.0f,   1.0f/273.0f, 
+                            4.0f/273.0f, 16.0f/273.0f,  26.0f/273.0f,   16.0f/273.0f,  4.0f/273.0f,
+                            7.0f/273.0f, 26.0f/273.0f,  41.0f/273.0f,   26.0f/273.0f,  7.0f/273.0f,
+                            4.0f/273.0f, 16.0f/273.0f,  26.0f/273.0f,   16f/273.0f,    4.0f/273.0f,
+                            1.0f/273.0f, 4.0f/273.0f,   7.0f/273.0f,    4.0f/273.0f,   1.0f/273.0f
+                        };
+    
+        Kernel kernel = new Kernel(5, 5, data);
+        ConvolveOp convolve = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        convolve.filter(imagem1, imagemAux);
+        
+        updateImage(imagemAux);
+        
+    }//GEN-LAST:event_jMIFiltroGaussiano5ActionPerformed
+
+    private void jMISharpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISharpenActionPerformed
+        // TODO add your handling code here:
+        
+        int height = imagem1.getHeight();
+        int width = imagem1.getWidth();
+        int type = imagem1.getType();
+        // Ampliar * 2
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
+        float data[] = {    -1.0f, -1.0f, -1.0f,
+                            -1.0f, 9.0f, -1.0f,
+                            -1.0f, -1.0f, -1.0f};
+    
+        Kernel kernel = new Kernel(3, 3, data);
+        ConvolveOp convolve = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        convolve.filter(imagem1, imagemAux);
+        
+        updateImage(imagemAux);
+    }//GEN-LAST:event_jMISharpenActionPerformed
+    
+
+    
+    
     
     private void savePGM_P2(String path)  {
         
@@ -981,7 +1108,7 @@ public class NewJFrame extends javax.swing.JFrame {
             
             
         } catch (UnsupportedEncodingException | FileNotFoundException ex) {
-            Logger.getLogger(NewJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ProcessamentoDeImagens.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }
@@ -1224,33 +1351,12 @@ public class NewJFrame extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(NewJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
-                new NewJFrame().setVisible(true);
+                new ProcessamentoDeImagens().setVisible(true);
             }
         });
     }
@@ -1264,6 +1370,9 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMIEscalaCinza;
     private javax.swing.JMenuItem jMIEspelhoHorizontal;
     private javax.swing.JMenuItem jMIEspelhoVertical;
+    private javax.swing.JMenuItem jMIFiltroGaussiano3;
+    private javax.swing.JMenuItem jMIFiltroGaussiano5;
+    private javax.swing.JMenuItem jMIFiltroMedia;
     private javax.swing.JMenuItem jMIGama;
     private javax.swing.JMenuItem jMIGreen;
     private javax.swing.JMenuItem jMIRed;
@@ -1275,11 +1384,13 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMISI;
     private javax.swing.JMenuItem jMISalvarPGM;
     private javax.swing.JMenuItem jMISepia;
+    private javax.swing.JMenuItem jMISharpen;
     private javax.swing.JMenuItem jMISobrepor;
     private javax.swing.JMenuItem jMNegativo;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
