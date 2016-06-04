@@ -90,6 +90,7 @@ public class ProcessamentoDeImagens extends javax.swing.JFrame {
         jMIFiltroGaussiano3 = new javax.swing.JMenuItem();
         jMIFiltroGaussiano5 = new javax.swing.JMenuItem();
         jMISharpen = new javax.swing.JMenuItem();
+        jMILaplaciano = new javax.swing.JMenuItem();
         jMISobrepor = new javax.swing.JMenuItem();
 
         jMenuItem4.setText("jMenuItem4");
@@ -389,6 +390,14 @@ public class ProcessamentoDeImagens extends javax.swing.JFrame {
         jMenu4.add(jMISharpen);
 
         jMenu2.add(jMenu4);
+
+        jMILaplaciano.setText("Laplaciano");
+        jMILaplaciano.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMILaplacianoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMILaplaciano);
 
         jMISobrepor.setText("Sobrepor");
         jMISobrepor.setEnabled(false);
@@ -1038,6 +1047,26 @@ public class ProcessamentoDeImagens extends javax.swing.JFrame {
         
         updateImage(imagemAux);
     }//GEN-LAST:event_jMISharpenActionPerformed
+
+    private void jMILaplacianoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMILaplacianoActionPerformed
+        // TODO add your handling code here:
+        
+        int height = imagem1.getHeight();
+        int width = imagem1.getWidth();
+        int type = imagem1.getType();
+        // Ampliar * 2
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
+        float data[] = {    0.0f, -1.0f, 0.0f,
+                            -1.0f, 4.0f, -1.0f,
+                            0.0f, -1.0f, 0.0f};
+    
+        Kernel kernel = new Kernel(3, 3, data);
+        ConvolveOp convolve = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        convolve.filter(imagem1, imagemAux);
+        
+        updateImage(imagemAux);
+    }//GEN-LAST:event_jMILaplacianoActionPerformed
     
 
     
@@ -1375,6 +1404,7 @@ public class ProcessamentoDeImagens extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMIFiltroMedia;
     private javax.swing.JMenuItem jMIGama;
     private javax.swing.JMenuItem jMIGreen;
+    private javax.swing.JMenuItem jMILaplaciano;
     private javax.swing.JMenuItem jMIRed;
     private javax.swing.JMenuItem jMIReducao;
     private javax.swing.JMenuItem jMIReset;
