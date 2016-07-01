@@ -1101,11 +1101,31 @@ public class guiImageOperations extends javax.swing.JFrame {
 
     private void jMISwirlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISwirlActionPerformed
         // TODO add your handling code here:
+        double x0 = 0.5 * (mainImage.getWidth()  - 1);
+        double y0 = 0.5 * (mainImage.getHeight() - 1);
+        BufferedImage newImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), mainImage.getType());
         
+        for (int sx = 0; sx < mainImage.getWidth(); sx++) {
+            for (int sy = 0; sy < mainImage.getHeight(); sy++) {
+                double dx = sx - x0;
+                double dy = sy - y0;
+                double r = Math.sqrt(dx*dx + dy*dy);
+                double angle = Math.PI / 512 * r;
+                int tx = (int) (+dx * Math.cos(angle) - dy * Math.sin(angle) + x0);
+                int ty = (int) (+dx * Math.sin(angle) + dy * Math.cos(angle) + y0);
+
+                // plot pixel (sx, sy) the same color as (tx, ty) if it's in bounds
+                if (tx >= 0 && tx < mainImage.getWidth() && ty >= 0 && ty < mainImage.getHeight())
+                    newImage.setRGB(sx, sy, mainImage.getRGB(tx, ty));
+            }
+        }
+        setMainImage(newImage);
+        
+        /*
         int angle  = 512;
         
         BufferedImage newImage = BufferedImageController.swirlEffect(mainImage, angle);
-        setMainImage(newImage);
+        setMainImage(newImage);*/
     }//GEN-LAST:event_jMISwirlActionPerformed
 
     private void jMIPrewittVerticalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIPrewittVerticalActionPerformed
