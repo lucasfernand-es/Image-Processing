@@ -1,5 +1,6 @@
 package Image.Util;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,10 +17,10 @@ import java.util.List;
  */
 public class Pixel {
     
-    private int x;
-    private int y;
+    private long x;
+    private long y;
     
-    private int color;
+    private Color color;
 
     
     public Pixel(int x, int y) {
@@ -28,38 +29,49 @@ public class Pixel {
         this.y = y;
     }
     
-    public Pixel(int x, int y, int color) {
+    public Pixel(int x, int y, Color color) {
         
         this.x = x;
         this.y = y;
         this.color = color;
     }
+
+    public Pixel() {
+    }
     
     /**
      * @return the x
      */
-    public int getX() {
+    public long getX() {
         return x;
+    }
+    
+    public int getIntX() {
+        return (int) x;
     }
 
     /**
      * @param x the x to set
      */
-    public void setX(int x) {
+    public void setX(long x) {
         this.x = x;
     }
 
     /**
      * @return the y
      */
-    public int getY() {
+    public long getY() {
         return y;
+    }
+    
+    public int getIntY() {
+        return (int) y;
     }
 
     /**
      * @param y the y to set
      */
-    public void setY(int y) {
+    public void setY(long y) {
         this.y = y;
     }
     
@@ -99,15 +111,21 @@ public class Pixel {
     /**
      * @return the color
      */
-    public int getColor() {
+    public Color getColor() {
         return color;
     }
 
     /**
      * @param color the color to set
      */
-    public void setColor(int color) {
+    public void setColor(Color color) {
         this.color = color;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.color.getRed() + " - " + this.color.getBlue()+ " - " + this.color.getBlue();
     }
     
 }

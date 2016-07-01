@@ -5,25 +5,16 @@
  */
 package Image.Controller;
 
+import Image.Util.Pixel;
+
+
 /**
  *
  * @author lucasfernandes
  */
-public enum TypeEffect {
+public interface ImageEffectPixelComplex {
     
-    GrayScale,
-    Negative,
-    Gamma,
-    Swirl,
-    
-    
-    
-    Erode,
-    
-    
-    
-    
-    
-    Median
+    // angle in radians
+    public void effect(Pixel pixel, double angle, double x0, double y0);
     
 }

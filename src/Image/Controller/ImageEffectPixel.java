@@ -5,7 +5,8 @@
  */
 package Image.Controller;
 
-import java.awt.Color;
+import Image.Util.Pixel;
+
 
 /**
  *
@@ -13,6 +14,6 @@ import java.awt.Color;
  */
 public interface ImageEffectPixel {
     
-    public int effect(Color color);
+    public void effect(Pixel pixel);
     
 }

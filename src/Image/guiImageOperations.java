@@ -11,7 +11,6 @@ package Image;
  * @author ionildo
  */
 import Image.Controller.BufferedImageController;
-import Image.Util.Pixel;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import javax.imageio.ImageIO;
@@ -19,8 +18,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
-import java.util.ArrayList;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +25,7 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import javax.swing.filechooser.*;
 
 
-import java.util.List;
+
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 
 public class guiImageOperations extends javax.swing.JFrame {
@@ -54,9 +51,9 @@ public class guiImageOperations extends javax.swing.JFrame {
     }
 
     
-    private void setMainImage(BufferedImage imagemAux) {
+    private void setMainImage(BufferedImage bufferedImage) {
         
-        this.mainImage = BufferedImageController.clone(imagemAux);
+        this.mainImage = BufferedImageController.clone(bufferedImage);
         ImageIcon icon = new ImageIcon(this.mainImage);
         this.jLImage.setIcon(icon);
         this.setSize(new Dimension((mainImage.getWidth() + 25 > 200)? mainImage.getWidth() + 25: 225, mainImage.getHeight() + 200));
@@ -119,7 +116,10 @@ public class guiImageOperations extends javax.swing.JFrame {
         jMISharpen = new javax.swing.JMenuItem();
         jMILaplaciano = new javax.swing.JMenuItem();
         jMISaltAndPepper = new javax.swing.JMenuItem();
-        jMIPrewitt = new javax.swing.JMenuItem();
+        jMIPrewittHorizontal = new javax.swing.JMenuItem();
+        jMIPrewittVertical = new javax.swing.JMenuItem();
+        jMISwirl = new javax.swing.JMenuItem();
+        jMIErosao = new javax.swing.JMenuItem();
         jMISobrepor = new javax.swing.JMenuItem();
 
         jMenuItem4.setText("jMenuItem4");
@@ -444,13 +444,37 @@ public class guiImageOperations extends javax.swing.JFrame {
         });
         jMenu2.add(jMISaltAndPepper);
 
-        jMIPrewitt.setText("Prewitt");
-        jMIPrewitt.addActionListener(new java.awt.event.ActionListener() {
+        jMIPrewittHorizontal.setText("Prewitt Horizontal");
+        jMIPrewittHorizontal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMIPrewittActionPerformed(evt);
+                jMIPrewittHorizontalActionPerformed(evt);
             }
         });
-        jMenu2.add(jMIPrewitt);
+        jMenu2.add(jMIPrewittHorizontal);
+
+        jMIPrewittVertical.setText("Prewitt Vertical");
+        jMIPrewittVertical.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIPrewittVerticalActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMIPrewittVertical);
+
+        jMISwirl.setText("Swirl");
+        jMISwirl.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMISwirlActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMISwirl);
+
+        jMIErosao.setText("Erosão");
+        jMIErosao.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIErosaoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMIErosao);
 
         jMISobrepor.setText("Sobrepor");
         jMISobrepor.setEnabled(false);
@@ -528,16 +552,16 @@ public class guiImageOperations extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMNegativoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMNegativoActionPerformed
-        BufferedImageController.negativeEffect(mainImage);
-        setMainImage(mainImage);
+        BufferedImage newImage = BufferedImageController.negativeEffect(mainImage);
+        setMainImage(newImage);
 
     }//GEN-LAST:event_jMNegativoActionPerformed
 
     private void jMIEscalaCinzaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIEscalaCinzaActionPerformed
         // TODO add your handling code here:
         
-        BufferedImageController.grayScaleEffect(mainImage);
-        setMainImage(mainImage);
+        BufferedImage newImage = BufferedImageController.grayScaleEffect(mainImage);
+        setMainImage(newImage);
     }//GEN-LAST:event_jMIEscalaCinzaActionPerformed
 
     private void jMIAmpliarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAmpliarActionPerformed
@@ -1030,22 +1054,22 @@ public class guiImageOperations extends javax.swing.JFrame {
                 JOptionPane.showInputDialog(null, "Digite a porcentagem de ruído", "Ruído Sal e Pimenta", INFORMATION_MESSAGE) 
         );
         
-        BufferedImageController.setSaltAndPepperNoise(mainImage, percentage/100);
         
-        setMainImage(mainImage);
+        BufferedImage newImage = BufferedImageController.setSaltAndPepperNoise(mainImage, percentage/100);
+        setMainImage(newImage);
 
     }//GEN-LAST:event_jMISaltAndPepperActionPerformed
 
     private void jMIMedianaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIMedianaActionPerformed
         // TODO add your handling code here:
         
-        BufferedImageController.medianFilterEffect(mainImage);
-        setMainImage(mainImage);
+        BufferedImage newImage = BufferedImageController.medianFilterEffect(mainImage);
+        setMainImage(newImage);
         
         
     }//GEN-LAST:event_jMIMedianaActionPerformed
 
-    private void jMIPrewittActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIPrewittActionPerformed
+    private void jMIPrewittHorizontalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIPrewittHorizontalActionPerformed
         // TODO add your handling code here:
         
         int height = mainImage.getHeight();
@@ -1073,7 +1097,47 @@ public class guiImageOperations extends javax.swing.JFrame {
         convolve.filter(mainImage, imagemAux);
         
         setMainImage(imagemAux);
-    }//GEN-LAST:event_jMIPrewittActionPerformed
+    }//GEN-LAST:event_jMIPrewittHorizontalActionPerformed
+
+    private void jMISwirlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISwirlActionPerformed
+        // TODO add your handling code here:
+        
+        int angle  = 512;
+        
+        BufferedImage newImage = BufferedImageController.swirlEffect(mainImage, angle);
+        setMainImage(newImage);
+    }//GEN-LAST:event_jMISwirlActionPerformed
+
+    private void jMIPrewittVerticalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIPrewittVerticalActionPerformed
+        // TODO add your handling code here:
+        
+        int height = mainImage.getHeight();
+        int width = mainImage.getWidth();
+        int type = mainImage.getType();
+        // Ampliar * 2
+        BufferedImage imagemAux = new BufferedImage(width, height, type);
+        
+       int oi[][] = { {0}, {1} };
+        
+        float data[] = {    
+                        -1, 0, 1,
+                        -1, 0, 1,
+                        -1, 0, 1
+        };
+    
+        Kernel kernel = new Kernel(3, 3, data);
+        ConvolveOp convolve = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        convolve.filter(mainImage, imagemAux);
+        
+        setMainImage(imagemAux);
+        
+    }//GEN-LAST:event_jMIPrewittVerticalActionPerformed
+
+    private void jMIErosaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIErosaoActionPerformed
+
+        BufferedImage newImage = BufferedImageController.erode(mainImage);
+        setMainImage(newImage);
+    }//GEN-LAST:event_jMIErosaoActionPerformed
     
     
     
@@ -1388,6 +1452,7 @@ public class guiImageOperations extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMIAbrirPGM;
     private javax.swing.JMenuItem jMIAmpliar;
     private javax.swing.JMenuItem jMIBlue;
+    private javax.swing.JMenuItem jMIErosao;
     private javax.swing.JMenuItem jMIEscalaCinza;
     private javax.swing.JMenuItem jMIEspelhoHorizontal;
     private javax.swing.JMenuItem jMIEspelhoVertical;
@@ -1399,7 +1464,8 @@ public class guiImageOperations extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMILaplaciano;
     private javax.swing.JMenuItem jMIMediana;
     private javax.swing.JMenuItem jMIOpenImage;
-    private javax.swing.JMenuItem jMIPrewitt;
+    private javax.swing.JMenuItem jMIPrewittHorizontal;
+    private javax.swing.JMenuItem jMIPrewittVertical;
     private javax.swing.JMenuItem jMIRed;
     private javax.swing.JMenuItem jMIReducao;
     private javax.swing.JMenuItem jMIReset;
@@ -1412,6 +1478,7 @@ public class guiImageOperations extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMISepia;
     private javax.swing.JMenuItem jMISharpen;
     private javax.swing.JMenuItem jMISobrepor;
+    private javax.swing.JMenuItem jMISwirl;
     private javax.swing.JMenuItem jMNegativo;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
